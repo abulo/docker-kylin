@@ -45,6 +45,7 @@ RUN	apt-get -y update && \
     apt-get install --no-install-recommends -y -q  net-tools wget lsof tar git mysql-server mysql-client nodejs npm unzip && \
 
     cd /home/admin && \
+    git config --global http.sslVerify false && \
     git clone https://github.com/abulo/docker-kylin.git && \
     # install mvn
     wget https://archive.apache.org/dist/maven/maven-3/3.6.1/binaries/apache-maven-3.6.1-bin.tar.gz  && \
