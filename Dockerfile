@@ -48,7 +48,7 @@ RUN	apt-get -y update && \
     git config --global http.sslVerify false && \
     git clone https://github.com/abulo/docker-kylin.git && \
     # install mvn
-    wget https://archive.apache.org/dist/maven/maven-3/3.6.1/binaries/apache-maven-3.6.1-bin.tar.gz  && \
+    wget --no-check-certificate https://archive.apache.org/dist/maven/maven-3/3.6.1/binaries/apache-maven-3.6.1-bin.tar.gz  && \
     tar -zxvf apache-maven-3.6.1-bin.tar.gz && \
     rm -f apache-maven-3.6.1-bin.tar.gz && \
     cp /home/admin/docker-kylin/conf/maven/settings.xml $MVN_HOME/conf/settings.xml && \
@@ -59,14 +59,14 @@ RUN	apt-get -y update && \
     rm -f /home/admin/jdk-8u141-linux-x64.tar.gz && \
 
     # install hadoop
-    wget https://archive.apache.org/dist/hadoop/core/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz && \
+    wget --no-check-certificate https://archive.apache.org/dist/hadoop/core/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz && \
     tar -zxvf /home/admin/hadoop-$HADOOP_VERSION.tar.gz && \
     rm -f /home/admin/hadoop-$HADOOP_VERSION.tar.gz && \
     mkdir -p /data/hadoop && \
     cp -rf /home/admin/docker-kylin/conf/hadoop/* $HADOOP_CONF/ && \
 
     # install hbase
-    wget https://archive.apache.org/dist/hbase/$HBASE_VERSION/hbase-$HBASE_VERSION-bin.tar.gz && \
+    wget --no-check-certificate https://archive.apache.org/dist/hbase/$HBASE_VERSION/hbase-$HBASE_VERSION-bin.tar.gz && \
     tar -zxvf /home/admin/hbase-$HBASE_VERSION-bin.tar.gz && \
     rm -f /home/admin/hbase-$HBASE_VERSION-bin.tar.gz && \
     mkdir -p /data/hbase && \
@@ -74,14 +74,14 @@ RUN	apt-get -y update && \
     cp /home/admin/docker-kylin/conf/hbase/hbase-site.xml $HBASE_HOME/conf && \
 
     # install hive
-    wget https://archive.apache.org/dist/hive/hive-$HIVE_VERSION/apache-hive-$HIVE_VERSION-bin.tar.gz && \
+    wget --no-check-certificate https://archive.apache.org/dist/hive/hive-$HIVE_VERSION/apache-hive-$HIVE_VERSION-bin.tar.gz && \
     tar -zxvf /home/admin/apache-hive-$HIVE_VERSION-bin.tar.gz && \
     rm -f /home/admin/apache-hive-$HIVE_VERSION-bin.tar.gz && \
-    wget -P $HIVE_HOME/lib https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.49/mysql-connector-java-5.1.49.jar && \
+    wget --no-check-certificate -P $HIVE_HOME/lib https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.49/mysql-connector-java-5.1.49.jar && \
     cp /home/admin/docker-kylin/conf/hive/hive-site.xml $HIVE_HOME/conf && \
 
     # install spark
-    wget https://archive.apache.org/dist/spark/spark-$SPARK_VERSION/spark-$SPARK_VERSION-bin-hadoop2.6.tgz && \
+    wget --no-check-certificate https://archive.apache.org/dist/spark/spark-$SPARK_VERSION/spark-$SPARK_VERSION-bin-hadoop2.6.tgz && \
     tar -zxvf /home/admin/spark-$SPARK_VERSION-bin-hadoop2.6.tgz && \
     rm -f /home/admin/spark-$SPARK_VERSION-bin-hadoop2.6.tgz && \
     cp $HIVE_HOME/conf/hive-site.xml $SPARK_HOME/conf && \
@@ -91,17 +91,17 @@ RUN	apt-get -y update && \
     echo spark.sql.catalogImplementation=hive > $SPARK_HOME/conf/spark-defaults.conf && \
 
     # install kafka
-    wget https://archive.apache.org/dist/kafka/$KAFKA_VERSION/kafka_2.11-$KAFKA_VERSION.tgz && \
+    wget --no-check-certificate https://archive.apache.org/dist/kafka/$KAFKA_VERSION/kafka_2.11-$KAFKA_VERSION.tgz && \
     tar -zxvf /home/admin/kafka_2.11-$KAFKA_VERSION.tgz && \
     rm -f /home/admin/kafka_2.11-$KAFKA_VERSION.tgz && \
 
     # install livy
-    wget https://www.apache.org/dist/incubator/livy/$LIVY_VERSION-incubating/apache-livy-$LIVY_VERSION-incubating-bin.zip && \
+    wget --no-check-certificate https://www.apache.org/dist/incubator/livy/$LIVY_VERSION-incubating/apache-livy-$LIVY_VERSION-incubating-bin.zip && \
     unzip /home/admin/apache-livy-$LIVY_VERSION-incubating-bin.zip && \
     rm -f /home/admin/apache-livy-$LIVY_VERSION-incubating-bin.zip && \
 
     # install Kylin
-    wget https://archive.apache.org/dist/kylin/apache-kylin-$KYLIN_VERSION/apache-kylin-$KYLIN_VERSION-bin-hbase1x.tar.gz && \
+    wget --no-check-certificate https://archive.apache.org/dist/kylin/apache-kylin-$KYLIN_VERSION/apache-kylin-$KYLIN_VERSION-bin-hbase1x.tar.gz && \
     tar -zxvf /home/admin/apache-kylin-$KYLIN_VERSION-bin-hbase1x.tar.gz && \
     rm -f /home/admin/apache-kylin-$KYLIN_VERSION-bin-hbase1x.tar.gz && \
     cp $HIVE_HOME/hcatalog/share/hcatalog/hive-hcatalog-core-1.2.1.jar $SPARK_HOME/jars/ && \
