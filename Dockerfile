@@ -122,7 +122,8 @@ RUN	apt-get -y update && \
     && echo kylin.engine.spark-fact-distinct=true >> $KYLIN_HOME/conf/kylin.properties \
     && echo kylin.engine.spark-udc-dictionary=true >> $KYLIN_HOME/conf/kylin.properties && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+    rm -rf /home/admin/docker-kylin
 
 COPY ./entrypoint.sh /home/admin/entrypoint.sh
 RUN chmod u+x /home/admin/entrypoint.sh
