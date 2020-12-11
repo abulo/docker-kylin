@@ -1,0 +1,7 @@
+- Jdk 1.8
+- Hadoop 2.7.0
+- Hive 1.2.1
+- Hbase 1.1.2 (With Zookeeper)
+- Spark 2.3.1
+- Kafka 1.1.1
+- MySQL 5.7.32

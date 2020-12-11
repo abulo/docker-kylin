@@ -76,7 +76,7 @@ RUN	apt-get -y update && \
     wget https://archive.apache.org/dist/hive/hive-$HIVE_VERSION/apache-hive-$HIVE_VERSION-bin.tar.gz && \
     tar -zxvf /home/admin/apache-hive-$HIVE_VERSION-bin.tar.gz && \
     rm -f /home/admin/apache-hive-$HIVE_VERSION-bin.tar.gz && \
-    wget -P $HIVE_HOME/lib https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.24/mysql-connector-java-5.1.24.jar && \
+    wget -P $HIVE_HOME/lib https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.49/mysql-connector-java-5.1.49.jar && \
     cp /home/admin/docker-kylin/conf/hive/hive-site.xml $HIVE_HOME/conf && \
 
     # install spark
@@ -85,7 +85,7 @@ RUN	apt-get -y update && \
     rm -f /home/admin/spark-$SPARK_VERSION-bin-hadoop2.6.tgz && \
     cp $HIVE_HOME/conf/hive-site.xml $SPARK_HOME/conf && \
     cp $SPARK_HOME/yarn/*.jar $HADOOP_HOME/share/hadoop/yarn/lib && \
-    cp $HIVE_HOME/lib/mysql-connector-java-5.1.24.jar $SPARK_HOME/jars && \
+    cp $HIVE_HOME/lib/mysql-connector-java-5.1.49.jar $SPARK_HOME/jars && \
     cp $HBASE_HOME/lib/hbase-protocol-1.1.2.jar $SPARK_HOME/jars && \
     echo spark.sql.catalogImplementation=hive > $SPARK_HOME/conf/spark-defaults.conf && \
 
@@ -125,7 +125,4 @@ RUN	apt-get -y update && \
 
 COPY ./entrypoint.sh /home/admin/entrypoint.sh
 RUN chmod u+x /home/admin/entrypoint.sh
-
 ENTRYPOINT ["/home/admin/entrypoint.sh"]
-
-    
