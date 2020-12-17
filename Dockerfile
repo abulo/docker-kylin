@@ -45,8 +45,8 @@ RUN	apt-get -y update && \
     wget -c -nv http://mirrors.linuxeye.com/oneinstack.tar.gz && \
     tar xzf oneinstack.tar.gz && \
     rm -rf oneinstack.tar.gz  && \
-    ./oneinstack/install.sh --db_option 4 --dbinstallmethod 1 --dbrootpwd 123456 && \
-    rm -rf ./oneinstack && \
+    /home/admin/oneinstack/install.sh --db_option 4 --dbinstallmethod 1 --dbrootpwd 123456 && \
+    rm -rf /home/admin/oneinstack && \
     git config --global http.sslVerify false && \
     git clone https://github.com/abulo/docker-kylin.git && \
     # install mvn
