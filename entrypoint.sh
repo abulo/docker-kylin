@@ -16,13 +16,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# echo "127.0.0.1 sandbox.hortonworks.com" >> /etc/hosts
+echo "127.0.0.1 sandbox.hortonworks.com" >> /etc/hosts
 
 # clean pid files
 rm -f /tmp/*.pid
 
 # start mysql
-/etc/init.d/mysql start
+service mysqld start
 if [ ! -f "/home/admin/first_run" ]
 then
     mysqladmin -uroot password 123456
