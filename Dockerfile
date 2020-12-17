@@ -38,7 +38,7 @@ RUN	apt-get -y update && \
     rm /etc/localtime && \
     ln -snf /usr/share/zoneinfo/UTC /etc/localtime && \
     dpkg-reconfigure -f noninteractive tzdata && \
-    apt-get install --no-install-recommends -y -q  net-tools wget lsof tar git mysql-server mysql-client nodejs npm unzip ca-certificates && \
+    apt-get install --no-install-recommends -y -q  net-tools wget lsof tar git mysql-server mysql-client nodejs npm unzip ca-certificates vim && \
     cd /home/admin && \
     git config --global http.sslVerify false && \
     git clone https://github.com/abulo/docker-kylin.git && \
@@ -68,7 +68,7 @@ RUN	apt-get -y update && \
     wget -c -nv --no-check-certificate https://archive.apache.org/dist/hive/hive-$HIVE_VERSION/apache-hive-$HIVE_VERSION-bin.tar.gz && \
     tar -zxf /home/admin/apache-hive-$HIVE_VERSION-bin.tar.gz && \
     rm -f /home/admin/apache-hive-$HIVE_VERSION-bin.tar.gz && \
-    wget -c -nv --no-check-certificate -P $HIVE_HOME/lib https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.24/mysql-connector-java-5.1.24.jar && \
+    wget -c -nv --no-check-certificate -P $HIVE_HOME/lib https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.49/mysql-connector-java-5.1.49.jar && \
     cp -rf /home/admin/docker-kylin/conf/hive/hive-site.xml $HIVE_HOME/conf && \
     # setup spark
     wget -c -nv --no-check-certificate https://archive.apache.org/dist/spark/spark-$SPARK_VERSION/spark-$SPARK_VERSION-bin-hadoop2.6.tgz && \
@@ -76,7 +76,7 @@ RUN	apt-get -y update && \
     rm -f /home/admin/spark-$SPARK_VERSION-bin-hadoop2.6.tgz && \
     cp -rf $HIVE_HOME/conf/hive-site.xml $SPARK_HOME/conf && \
     cp -rf $SPARK_HOME/yarn/*.jar $HADOOP_HOME/share/hadoop/yarn/lib && \
-    cp -rf $HIVE_HOME/lib/mysql-connector-java-5.1.24.jar $SPARK_HOME/jars && \
+    cp -rf $HIVE_HOME/lib/mysql-connector-java-5.1.49.jar $SPARK_HOME/jars && \
     cp -rf $HBASE_HOME/lib/hbase-protocol-1.1.2.jar $SPARK_HOME/jars && \
     echo spark.sql.catalogImplementation=hive > $SPARK_HOME/conf/spark-defaults.conf && \
     # setup kafka
