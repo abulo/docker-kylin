@@ -38,12 +38,12 @@ RUN	apt-get -y update && \
     rm /etc/localtime && \
     ln -snf /usr/share/zoneinfo/UTC /etc/localtime && \
     dpkg-reconfigure -f noninteractive tzdata && \
-    apt-get install --no-install-recommends -y -q  net-tools wget lsof tar git mysql-server mysql-client nodejs npm unzip && \
+    apt-get install --no-install-recommends -y -q  net-tools wget lsof tar git mysql-server mysql-client nodejs npm unzip ca-certificates && \
     cd /home/admin && \
     git config --global http.sslVerify false && \
     git clone https://github.com/abulo/docker-kylin.git && \
     # install mvn
-    wget -c -nv https://archive.apache.org/dist/maven/maven-3/3.6.1/binaries/apache-maven-3.6.1-bin.tar.gz && \
+    wget -c -nv --no-check-certificate https://archive.apache.org/dist/maven/maven-3/3.6.1/binaries/apache-maven-3.6.1-bin.tar.gz && \
     tar -zxf apache-maven-3.6.1-bin.tar.gz && \
     rm -f apache-maven-3.6.1-bin.tar.gz && \
     cp -rf /home/admin/docker-kylin/conf/maven/settings.xml $MVN_HOME/conf/settings.xml && \
@@ -65,7 +65,7 @@ RUN	apt-get -y update && \
     mkdir -p /data/zookeeper && \
     cp -rf /home/admin/docker-kylin/conf/hbase/hbase-site.xml $HBASE_HOME/conf && \
     # setup hive
-    wget -c -nv https://archive.apache.org/dist/hive/hive-$HIVE_VERSION/apache-hive-$HIVE_VERSION-bin.tar.gz && \
+    wget -c -nv --no-check-certificate https://archive.apache.org/dist/hive/hive-$HIVE_VERSION/apache-hive-$HIVE_VERSION-bin.tar.gz && \
     tar -zxf /home/admin/apache-hive-$HIVE_VERSION-bin.tar.gz && \
     rm -f /home/admin/apache-hive-$HIVE_VERSION-bin.tar.gz && \
     wget -c -nv --no-check-certificate -P $HIVE_HOME/lib https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.24/mysql-connector-java-5.1.24.jar && \
