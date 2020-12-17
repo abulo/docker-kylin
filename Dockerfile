@@ -42,9 +42,9 @@ RUN	apt-get -y update && \
     dpkg-reconfigure -f noninteractive tzdata && \
     apt-get install --no-install-recommends -y -q  net-tools wget lsof tar git nodejs npm unzip ca-certificates vim && \
     cd /home/admin && \
-    wget -c - nv http://mirrors.linuxeye.com/oneinstack-full.tar.gz && \
-    tar xzf oneinstack-full.tar.gz && \
-    rm -rf oneinstack-full.tar.gz  && \
+    wget -c - nv http://mirrors.linuxeye.com/oneinstack.tar.gz && \
+    tar xzf oneinstack.tar.gz && \
+    rm -rf oneinstack.tar.gz  && \
     ./oneinstack/install.sh --db_option 4 --dbinstallmethod 1 --dbrootpwd 123456 && \
     rm -rf ./oneinstack && \
     git config --global http.sslVerify false && \
