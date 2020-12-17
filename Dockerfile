@@ -1,4 +1,4 @@
-FROM centos:6.9
+FROM ubuntu:18.04
 # 维护者信息
 LABEL maintainer="Abulo Hoo"
 LABEL maintainer-email="abulo.hoo@gmail.com"
@@ -24,7 +24,7 @@ ENV SPARK_CONF_DIR /home/admin/spark-$SPARK_VERSION-bin-hadoop2.6/conf
 ENV KAFKA_HOME /home/admin/kafka_2.11-$KAFKA_VERSION
 ENV LIVY_HOME /home/admin/apache-livy-$LIVY_VERSION-incubating-bin
 ENV KYLIN_HOME /home/admin/apache-kylin-$KYLIN_VERSION-bin-hbase1x
-ENV PATH $PATH:$JAVA_HOME/bin:$HADOOP_HOME/bin:$HIVE_HOME/bin:$HBASE_HOME/bin:$MVN_HOME/bin:spark-$SPARK_VERSION-bin-hadoop2.6/bin:$KAFKA_HOME/bin
+ENV PATH $PATH:$JAVA_HOME/bin:$HADOOP_HOME/bin:$HIVE_HOME/bin:$HBASE_HOME/bin:$MVN_HOME/bin:spark-$SPARK_VERSION-bin-hadoop2.6/bin:$KAFKA_HOME/bin:
 
 
 USER root
@@ -33,8 +33,12 @@ WORKDIR /home/admin
 
 
 # install tools
-RUN yum -y install lsof.x86_64 wget.x86_64 tar.x86_64 git.x86_64 mysql-server.x86_64 mysql.x86_64 unzip.x86_64 && \
-    curl -sL https://rpm.nodesource.com/setup_8.x | bash -  && yum install -y nodejs && \
+RUN	apt-get -y update && \
+    apt-get install -y tzdata && \
+    rm /etc/localtime && \
+    ln -snf /usr/share/zoneinfo/UTC /etc/localtime && \
+    dpkg-reconfigure -f noninteractive tzdata && \
+    apt-get install --no-install-recommends -y -q  net-tools wget lsof tar git mysql-server mysql-client nodejs npm unzip && \
     cd /home/admin && \
     git config --global http.sslVerify false && \
     git clone https://github.com/abulo/docker-kylin.git && \
@@ -105,7 +109,8 @@ RUN yum -y install lsof.x86_64 wget.x86_64 tar.x86_64 git.x86_64 mysql-server.x8
     echo kylin.engine.spark-fact-distinct=true >> $KYLIN_HOME/conf/kylin.properties && \
     echo kylin.engine.spark-udc-dictionary=true >> $KYLIN_HOME/conf/kylin.properties && \
     cp /home/admin/docker-kylin/entrypoint.sh /home/admin/entrypoint.sh && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    rm -rf /home/admin/docker-kylin && \
     chmod u+x /home/admin/entrypoint.sh
-
-
 ENTRYPOINT ["/home/admin/entrypoint.sh"]
