@@ -22,12 +22,7 @@
 rm -f /tmp/*.pid
 
 # start mysql
-/etc/init.d/mysql start
-if [ ! -f "/home/admin/first_run" ]
-then
-    mysqladmin -uroot password 123456
-    mysql -uroot -p123456 -e "grant all privileges on root.* to root@'%' identified by '123456';"
-fi
+/etc/init.d/mysqld start
 
 # start hdfs
 if [ ! -f "/home/admin/first_run" ]

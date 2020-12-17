@@ -1,7 +1,9 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 # 维护者信息
 LABEL maintainer="Abulo Hoo"
 LABEL maintainer-email="abulo.hoo@gmail.com"
+
+
 
 
 ENV HIVE_VERSION 1.2.1
@@ -38,8 +40,13 @@ RUN	apt-get -y update && \
     rm /etc/localtime && \
     ln -snf /usr/share/zoneinfo/UTC /etc/localtime && \
     dpkg-reconfigure -f noninteractive tzdata && \
-    apt-get install --no-install-recommends -y -q  net-tools wget lsof tar git mysql-server mysql-client nodejs npm unzip ca-certificates vim && \
+    apt-get install --no-install-recommends -y -q  net-tools wget lsof tar git nodejs npm unzip ca-certificates vim && \
     cd /home/admin && \
+    wget -c - nv http://mirrors.linuxeye.com/oneinstack-full.tar.gz && \
+    tar xzf oneinstack-full.tar.gz && \
+    rm -rf oneinstack-full.tar.gz  && \
+    ./oneinstack/install.sh --db_option 4 --dbinstallmethod 1 --dbrootpwd 123456 && \
+    rm -rf ./oneinstack && \
     git config --global http.sslVerify false && \
     git clone https://github.com/abulo/docker-kylin.git && \
     # install mvn
@@ -68,7 +75,7 @@ RUN	apt-get -y update && \
     wget -c -nv --no-check-certificate https://archive.apache.org/dist/hive/hive-$HIVE_VERSION/apache-hive-$HIVE_VERSION-bin.tar.gz && \
     tar -zxf /home/admin/apache-hive-$HIVE_VERSION-bin.tar.gz && \
     rm -f /home/admin/apache-hive-$HIVE_VERSION-bin.tar.gz && \
-    wget -c -nv --no-check-certificate -P $HIVE_HOME/lib https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.49/mysql-connector-java-5.1.49.jar && \
+    wget -c -nv --no-check-certificate -P $HIVE_HOME/lib https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.38/mysql-connector-java-5.1.38.jar && \
     cp -rf /home/admin/docker-kylin/conf/hive/hive-site.xml $HIVE_HOME/conf && \
     # setup spark
     wget -c -nv --no-check-certificate https://archive.apache.org/dist/spark/spark-$SPARK_VERSION/spark-$SPARK_VERSION-bin-hadoop2.6.tgz && \
@@ -76,7 +83,7 @@ RUN	apt-get -y update && \
     rm -f /home/admin/spark-$SPARK_VERSION-bin-hadoop2.6.tgz && \
     cp -rf $HIVE_HOME/conf/hive-site.xml $SPARK_HOME/conf && \
     cp -rf $SPARK_HOME/yarn/*.jar $HADOOP_HOME/share/hadoop/yarn/lib && \
-    cp -rf $HIVE_HOME/lib/mysql-connector-java-5.1.49.jar $SPARK_HOME/jars && \
+    cp -rf $HIVE_HOME/lib/mysql-connector-java-5.1.38.jar $SPARK_HOME/jars && \
     cp -rf $HBASE_HOME/lib/hbase-protocol-1.1.2.jar $SPARK_HOME/jars && \
     echo spark.sql.catalogImplementation=hive > $SPARK_HOME/conf/spark-defaults.conf && \
     # setup kafka
