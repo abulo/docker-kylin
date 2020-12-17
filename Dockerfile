@@ -43,36 +43,36 @@ RUN	apt-get -y update && \
     git config --global http.sslVerify false && \
     git clone https://github.com/abulo/docker-kylin.git && \
     # install mvn
-    wget https://archive.apache.org/dist/maven/maven-3/3.6.1/binaries/apache-maven-3.6.1-bin.tar.gz && \
-    tar -zxvf apache-maven-3.6.1-bin.tar.gz && \
+    wget -c -nv https://archive.apache.org/dist/maven/maven-3/3.6.1/binaries/apache-maven-3.6.1-bin.tar.gz && \
+    tar -zxf apache-maven-3.6.1-bin.tar.gz && \
     rm -f apache-maven-3.6.1-bin.tar.gz && \
     cp -rf /home/admin/docker-kylin/conf/maven/settings.xml $MVN_HOME/conf/settings.xml && \
     # setup jdk
-    wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u141-b15/336fa29ff2bb4ef291e347e091f7f4a7/jdk-8u141-linux-x64.tar.gz" && \
-    tar -zxvf /home/admin/jdk-8u141-linux-x64.tar.gz && \
+    wget -c -nv --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u141-b15/336fa29ff2bb4ef291e347e091f7f4a7/jdk-8u141-linux-x64.tar.gz" && \
+    tar -zxf /home/admin/jdk-8u141-linux-x64.tar.gz && \
     rm -f /home/admin/jdk-8u141-linux-x64.tar.gz && \
     # setup hadoop
-    wget --no-check-certificate https://archive.apache.org/dist/hadoop/core/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz && \
-    tar -zxvf /home/admin/hadoop-$HADOOP_VERSION.tar.gz && \
+    wget -c -nv --no-check-certificate https://archive.apache.org/dist/hadoop/core/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz && \
+    tar -zxf /home/admin/hadoop-$HADOOP_VERSION.tar.gz && \
     rm -f /home/admin/hadoop-$HADOOP_VERSION.tar.gz && \
     mkdir -p /data/hadoop && \
     cp -rf /home/admin/docker-kylin/conf/hadoop/* $HADOOP_CONF/ && \
     # setup hbase
-    wget --no-check-certificate https://archive.apache.org/dist/hbase/$HBASE_VERSION/hbase-$HBASE_VERSION-bin.tar.gz && \
-    tar -zxvf /home/admin/hbase-$HBASE_VERSION-bin.tar.gz && \
+    wget -c -nv --no-check-certificate https://archive.apache.org/dist/hbase/$HBASE_VERSION/hbase-$HBASE_VERSION-bin.tar.gz && \
+    tar -zxf /home/admin/hbase-$HBASE_VERSION-bin.tar.gz && \
     rm -f /home/admin/hbase-$HBASE_VERSION-bin.tar.gz && \
     mkdir -p /data/hbase && \
     mkdir -p /data/zookeeper && \
     cp -rf /home/admin/docker-kylin/conf/hbase/hbase-site.xml $HBASE_HOME/conf && \
     # setup hive
-    wget https://archive.apache.org/dist/hive/hive-$HIVE_VERSION/apache-hive-$HIVE_VERSION-bin.tar.gz && \
-    tar -zxvf /home/admin/apache-hive-$HIVE_VERSION-bin.tar.gz && \
+    wget -c -nv https://archive.apache.org/dist/hive/hive-$HIVE_VERSION/apache-hive-$HIVE_VERSION-bin.tar.gz && \
+    tar -zxf /home/admin/apache-hive-$HIVE_VERSION-bin.tar.gz && \
     rm -f /home/admin/apache-hive-$HIVE_VERSION-bin.tar.gz && \
-    wget --no-check-certificate -P $HIVE_HOME/lib https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.24/mysql-connector-java-5.1.24.jar && \
+    wget -c -nv --no-check-certificate -P $HIVE_HOME/lib https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.24/mysql-connector-java-5.1.24.jar && \
     cp -rf /home/admin/docker-kylin/conf/hive/hive-site.xml $HIVE_HOME/conf && \
     # setup spark
-    wget --no-check-certificate https://archive.apache.org/dist/spark/spark-$SPARK_VERSION/spark-$SPARK_VERSION-bin-hadoop2.6.tgz && \
-    tar -zxvf /home/admin/spark-$SPARK_VERSION-bin-hadoop2.6.tgz && \
+    wget -c -nv --no-check-certificate https://archive.apache.org/dist/spark/spark-$SPARK_VERSION/spark-$SPARK_VERSION-bin-hadoop2.6.tgz && \
+    tar -zxf /home/admin/spark-$SPARK_VERSION-bin-hadoop2.6.tgz && \
     rm -f /home/admin/spark-$SPARK_VERSION-bin-hadoop2.6.tgz && \
     cp -rf $HIVE_HOME/conf/hive-site.xml $SPARK_HOME/conf && \
     cp -rf $SPARK_HOME/yarn/*.jar $HADOOP_HOME/share/hadoop/yarn/lib && \
@@ -80,16 +80,16 @@ RUN	apt-get -y update && \
     cp -rf $HBASE_HOME/lib/hbase-protocol-1.1.2.jar $SPARK_HOME/jars && \
     echo spark.sql.catalogImplementation=hive > $SPARK_HOME/conf/spark-defaults.conf && \
     # setup kafka
-    wget  --no-check-certificate https://archive.apache.org/dist/kafka/$KAFKA_VERSION/kafka_2.11-$KAFKA_VERSION.tgz && \
-    tar -zxvf /home/admin/kafka_2.11-$KAFKA_VERSION.tgz && \
+    wget -c -nv  --no-check-certificate https://archive.apache.org/dist/kafka/$KAFKA_VERSION/kafka_2.11-$KAFKA_VERSION.tgz && \
+    tar -zxf /home/admin/kafka_2.11-$KAFKA_VERSION.tgz && \
     rm -f /home/admin/kafka_2.11-$KAFKA_VERSION.tgz   && \
     # setup livy
-    wget  --no-check-certificate https://www.apache.org/dist/incubator/livy/$LIVY_VERSION-incubating/apache-livy-$LIVY_VERSION-incubating-bin.zip && \
+    wget -c -nv  --no-check-certificate https://www.apache.org/dist/incubator/livy/$LIVY_VERSION-incubating/apache-livy-$LIVY_VERSION-incubating-bin.zip && \
     unzip /home/admin/apache-livy-$LIVY_VERSION-incubating-bin.zip && \
     rm -f /home/admin/apache-livy-$LIVY_VERSION-incubating-bin.zip && \
     # Download released Kylin
-    wget --no-check-certificate https://archive.apache.org/dist/kylin/apache-kylin-$KYLIN_VERSION/apache-kylin-$KYLIN_VERSION-bin-hbase1x.tar.gz && \
-    tar -zxvf /home/admin/apache-kylin-$KYLIN_VERSION-bin-hbase1x.tar.gz && \
+    wget -c -nv --no-check-certificate https://archive.apache.org/dist/kylin/apache-kylin-$KYLIN_VERSION/apache-kylin-$KYLIN_VERSION-bin-hbase1x.tar.gz && \
+    tar -zxf /home/admin/apache-kylin-$KYLIN_VERSION-bin-hbase1x.tar.gz && \
     rm -f /home/admin/apache-kylin-$KYLIN_VERSION-bin-hbase1x.tar.gz && \
     cp -rf $HIVE_HOME/hcatalog/share/hcatalog/hive-hcatalog-core-1.2.1.jar $SPARK_HOME/jars/ && \
     #seting
