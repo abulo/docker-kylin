@@ -3,16 +3,19 @@
 <configuration>
   <property>
     <name>hbase.tmp.dir</name>
-    <value>/data/hbase</value>
+    <value>tmp</value>
   </property>
-  <property>
-    <name>hbase.rootdir</name>
-    <value>hdfs://localhost:9000/hbase</value>
-  </property>
-  <property>
-    <name>hbase.zookeeper.property.dataDir</name>
-    <value>/data/zookeeper</value>
-  </property>
+
+   <property>
+      <name>hbase.rootdir</name>
+      <value>hdfs://localhost:9000/hbase</value>
+   </property>
+	
+   <property>
+      <name>hbase.zookeeper.property.dataDir</name>
+      <value>/tmp/zookeeper</value>
+   </property>
+
   <property>
     <name>hbase.unsafe.stream.capability.enforce</name>
     <value>false</value>

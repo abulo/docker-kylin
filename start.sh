@@ -43,10 +43,10 @@ hdfs dfs -chmod g+x /historyserverforSpark
 hdfs dfs -chmod g+x /user/hive/warehouse
 
 # init metastore
-schematool -initSchema -dbType mysql
+# schematool -initSchema -dbType mysql
 
 # 4��Hbase
-sed -i '28 a export JAVA_HOME=/usr/local/share/jdk1.8.0_181' /usr/local/share/hbase-2.2.4/conf/hbase-env.sh
+sed -i '28 a export JAVA_HOME=/home/admin/jdk' /home/admin/hbase/conf/hbase-env.sh
 start-hbase.sh
 
 # 5��start zk
