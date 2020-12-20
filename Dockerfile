@@ -10,7 +10,7 @@ USER root
 WORKDIR /home/admin
 
 # 设置源
-# RUN  sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/' /etc/apt/sources.list
+RUN  sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/' /etc/apt/sources.list
 
 #安装 mysql 
 
@@ -54,14 +54,14 @@ RUN cd /home/admin && \
     git clone https://github.com/abulo/docker-kylin.git && \
 	# 安装 jdk 
 	wget -c -nv --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u271-b09/61ae65e088624f5aaa0b1d2d801acb16/jdk-8u271-linux-x64.tar.gz" && \
-    tar -zxf jdk-8u141-linux-x64.tar.gz && \
-    rm -rf jdk-8u141-linux-x64.tar.gz && \
+    tar zxf /home/admin/jdk-8u141-linux-x64.tar.gz && \
+    rm -rf /home/admin/jdk-8u141-linux-x64.tar.gz && \
 	mv jdk1.8.0_271 jdk && \
 
 	#安装 hadoop
 	wget -c -nv --no-check-certificate https://archive.apache.org/dist/hadoop/core/hadoop-3.0.3/hadoop-3.0.3.tar.gz && \
-	tar zxf hadoop-3.0.3.tar.gz && \
-	rm -rf hadoop-3.0.3.tar.gz && \
+	tar zxf /home/admin/hadoop-3.0.3.tar.gz && \
+	rm -rf /home/admin/hadoop-3.0.3.tar.gz && \
 	mv hadoop-3.0.3 hadoop && \
 	#配置文件
 	cp -rf /home/admin/docker-kylin/conf/hadoop/hadoop/core-site.xml /home/admin/hadoop/etc/hadoop/core-site.xml && \
@@ -70,21 +70,21 @@ RUN cd /home/admin && \
     cp -rf /home/admin/docker-kylin/conf/hadoop/yarn/yarn-site.xml /home/admin/hadoop/etc/hadoop/yarn-site.xml && \
 	# 安装 maven
 	wget -c -nv --no-check-certificate https://archive.apache.org/dist/maven/maven-3/3.6.1/binaries/apache-maven-3.6.1-bin.tar.gz && \
-    tar -zxf apache-maven-3.6.1-bin.tar.gz && \
-    rm -rf apache-maven-3.6.1-bin.tar.gz && \
+    tar -zxf /home/admin/apache-maven-3.6.1-bin.tar.gz && \
+    rm -rf /home/admin/apache-maven-3.6.1-bin.tar.gz && \
 	mv apache-maven-3.6.1-bin maven && \
 	# 安装 hbase 
 	wget -c -nv --no-check-certificate  https://archive.apache.org/dist/hbase/2.2.4/hbase-2.2.4-bin.tar.gz && \
-	tar -zxf hbase-2.2.4-bin.tar.gz && \
-    rm -rf hbase-2.2.4-bin.tar.gz && \
+	tar -zxf /home/admin/hbase-2.2.4-bin.tar.gz && \
+    rm -rf /home/admin/hbase-2.2.4-bin.tar.gz && \
 	mv hbase-2.2.4-bin hbase && \
 	# 配置文件
 	cp -rf /home/admin/docker-kylin/conf/hbase/hbase-site.xml /home/admin/hbase/conf/hbase-site.xml && \
     cp -rf /home/admin/docker-kylin/conf/hbase/hbase /home/admin/hbase/bin/hbase && \
 	#安装 hive 
 	wget -c -nv --no-check-certificate  https://archive.apache.org/dist/hive/hive-3.1.2/apache-hive-3.1.2-bin.tar.gz && \
-	tar -zxf apache-hive-3.1.2-bin.tar.gz && \
-    rm -rf apache-hive-3.1.2-bin.tar.gz && \
+	tar -zxf /home/admin/apache-hive-3.1.2-bin.tar.gz && \
+    rm -rf /home/admin/apache-hive-3.1.2-bin.tar.gz && \
 	mv apache-hive-3.1.2-bin hive && \
 	#配置
 	cp -rf /home/admin/docker-kylin/conf/hive/hive-site.xml /home/admin/hive/conf/hive-site.xml && \
@@ -92,8 +92,8 @@ RUN cd /home/admin && \
 	cp -rf /home/admin/docker-kylin/conf/mysql/mysql-connector-java-5.1.45-bin.jar /home/admin/hive/lib/mysql-connector-java-5.1.45-bin.jar && \
 	# 安装 spark
 	wget -c -nv --no-check-certificate   https://archive.apache.org/dist/spark/spark-2.4.5/spark-2.4.5-bin-without-hadoop.tgz && \
-	tar -zxf spark-2.4.5-bin-without-hadoop.tgz && \
-    rm -rf spark-2.4.5-bin-without-hadoop.tgz && \
+	tar -zxf /home/admin/spark-2.4.5-bin-without-hadoop.tgz && \
+    rm -rf /home/admin/spark-2.4.5-bin-without-hadoop.tgz && \
 	mv spark-2.4.5-bin-without-hadoop spark && \
 	# 配置
 	cp -rf /home/admin/docker-kylin/conf/spark/spark-env.sh /home/admin/spark/conf/spark-env.sh && \
@@ -101,24 +101,24 @@ RUN cd /home/admin && \
 	cp -rf /home/admin/docker-kylin/conf/spark/slaves /home/admin/spark/conf/slaves && \
 	#安装 scala
 	wget -c -nv --no-check-certificate https://downloads.lightbend.com/scala/2.11.12/scala-2.11.12.tgz && \
-	tar -zxf scala-2.11.12.tgz && \
-    rm -rf scala-2.11.12.tgz && \
+	tar -zxf /home/admin/scala-2.11.12.tgz && \
+    rm -rf /home/admin/scala-2.11.12.tgz && \
 	mv scala-2.11.12 scala && \
 	#安装 Zookeeper
 	wget -c -nv --no-check-certificate https://archive.apache.org/dist/zookeeper/zookeeper-3.4.5/zookeeper-3.4.5.tar.gz && \
-	tar -zxf zookeeper-3.4.5.tar.gz && \
-    rm -rf zookeeper-3.4.5.tar.gz && \
+	tar -zxf /home/admin/zookeeper-3.4.5.tar.gz && \
+    rm -rf /home/admin/zookeeper-3.4.5.tar.gz && \
 	mv zookeeper-3.4.5 zookeeper && \
 	cp -rf /home/admin/docker-kylin/conf/zk/zoo.cfg /home/admin/zookeeper/conf/zoo.cfg && \
 	# 安装 kafka
 	wget -c -nv --no-check-certificate  https://archive.apache.org/dist/kafka/2.4.1/kafka_2.11-2.4.1.tgz && \
-	tar -zxf kafka_2.11-2.4.1.tgz && \
-    rm -rf kafka_2.11-2.4.1.tgz && \
+	tar -zxf /home/admin/kafka_2.11-2.4.1.tgz && \
+    rm -rf /home/admin/kafka_2.11-2.4.1.tgz && \
 	mv kafka_2.11-2.4.1 kafka && \
 	#安装 kylin 
 	wget -c -nv --no-check-certificate https://archive.apache.org/dist/kylin/apache-kylin-3.0.1/apache-kylin-3.0.1-bin-hadoop3.tar.gz && \
-	tar -zxf apache-kylin-3.0.1-bin-hadoop3.tar.gz && \
-    rm -rf apache-kylin-3.0.1-bin-hadoop3.tar.gz && \
+	tar -zxf /home/admin/apache-kylin-3.0.1-bin-hadoop3.tar.gz && \
+    rm -rf /home/admin/apache-kylin-3.0.1-bin-hadoop3.tar.gz && \
 	mv apache-kylin-3.0.1-bin-hadoop3 kylin && \
 	cp -rf /home/admin/docker-kylin/conf/kylin/kylin.properties /home/admin/kylin/conf/kylin.properties && \
 	cp -rf /home/admin/docker-kylin/conf/mysql/mysql-connector-java-5.1.45-bin.jar /home/admin/kylin/ext/mysql-connector-java-5.1.45-bin.jar && \
