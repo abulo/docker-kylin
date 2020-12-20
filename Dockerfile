@@ -76,7 +76,7 @@ RUN cd /home/admin && \
 	wget -c -nv --no-check-certificate  https://archive.apache.org/dist/hbase/2.2.4/hbase-2.2.4-bin.tar.gz && \
 	tar -zxf hbase-2.2.4-bin.tar.gz && \
     rm -rf  hbase-2.2.4-bin.tar.gz && \
-	mv hbase-2.2.4-bin hbase && \
+	mv hbase-2.2.4 hbase && \
 	# 配置文件
 	cp -rf /home/admin/docker-kylin/conf/hbase/hbase-site.xml /home/admin/hbase/conf/hbase-site.xml && \
     cp -rf /home/admin/docker-kylin/conf/hbase/hbase /home/admin/hbase/bin/hbase && \
