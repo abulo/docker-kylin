@@ -120,7 +120,8 @@ RUN cd /home/admin && \
     rm -rf  apache-kylin-3.0.1-bin-hadoop3.tar.gz && \
 	mv apache-kylin-3.0.1-bin-hadoop3 kylin && \
 	cp -rf /home/admin/docker-kylin/conf/kylin/kylin.properties /home/admin/kylin/conf/kylin.properties && \
-	cp -rf /home/admin/docker-kylin/conf/mysql/mysql-connector-java-5.1.45-bin.jar /home/admin/kylin/ext/mysql-connector-java-5.1.45-bin.jar && \
+
+	# cp -rf /home/admin/docker-kylin/conf/mysql/mysql-connector-java-5.1.45-bin.jar /home/admin/kylin/ext/mysql-connector-java-5.1.45-bin.jar && \
 	cp /home/admin/docker-kylin/conf/mysql/docker-entrypoint.sh  /home/admin/mysql.sh && \
 	chmod u+x /home/admin/mysql.sh && \
 	cp /home/admin/docker-kylin/conf/start.sh  /home/admin/start.sh && \
