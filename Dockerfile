@@ -71,7 +71,7 @@ RUN cd /home/admin && \
 	wget -c -nv --no-check-certificate https://archive.apache.org/dist/maven/maven-3/3.6.1/binaries/apache-maven-3.6.1-bin.tar.gz && \
     tar -zxf apache-maven-3.6.1-bin.tar.gz && \
     rm -rf  apache-maven-3.6.1-bin.tar.gz && \
-	mv apache-maven-3.6.1-bin maven && \
+	mv apache-maven-3.6.1 maven && \
 	# 安装 hbase 
 	wget -c -nv --no-check-certificate  https://archive.apache.org/dist/hbase/2.2.4/hbase-2.2.4-bin.tar.gz && \
 	tar -zxf hbase-2.2.4-bin.tar.gz && \
