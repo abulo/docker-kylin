@@ -10,19 +10,10 @@ USER root
 WORKDIR /home/admin
 
 # 设置源
-RUN  sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/' /etc/apt/sources.list
+# RUN  sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/' /etc/apt/sources.list
 
 #安装 mysql 
-RUN cd /home/admin && \
-    groupadd -r mysql && \
-    useradd -r -g mysql mysql && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends  curl net-tools  ca-certificates wget git mysql-server mysql-client && \
-	rm -rf /var/lib/apt/lists/* && \
-	rm -rf /var/lib/mysql && mkdir -p /var/lib/mysql /var/run/mysqld && \
-	chown -R mysql:mysql /var/lib/mysql /var/run/mysqld && \
-	chmod 1777 /var/run/mysqld /var/lib/mysql && \
-    mkdir /docker-entrypoint-initdb.d
+
 
 
 #数据分析模块环境变量
@@ -49,6 +40,16 @@ ENV LC_CTYPE=en_us
 ENV LANG=en_us.UTF-8
 #安装 
 RUN cd /home/admin && \
+    groupadd -r mysql && \
+    useradd -r -g mysql mysql && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends  curl net-tools  ca-certificates wget git mysql-server mysql-client && \
+	rm -rf /var/lib/apt/lists/* && \
+	rm -rf /var/lib/mysql && mkdir -p /var/lib/mysql /var/run/mysqld && \
+	chown -R mysql:mysql /var/lib/mysql /var/run/mysqld && \
+	chmod 1777 /var/run/mysqld /var/lib/mysql && \
+    mkdir /docker-entrypoint-initdb.d && \
+	cd /home/admin && \
 	git config --global http.sslVerify false && \
     git clone https://github.com/abulo/docker-kylin.git && \
 	# 安装 jdk 
@@ -125,7 +126,8 @@ RUN cd /home/admin && \
 	chmod u+x /home/admin/mysql.sh && \
 	cp /home/admin/docker-kylin/conf/start.sh  /home/admin/start.sh && \
 	chmod u+x /home/admin/start.sh && \
-	rm -rf /home/admin/docker-kylin 
+	rm -rf /home/admin/docker-kylin && \
+	apt-get clean 
 
 VOLUME /var/lib/mysql
 ENTRYPOINT ["/home/admin/start.sh"]
