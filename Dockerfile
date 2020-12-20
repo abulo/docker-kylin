@@ -1,146 +1,131 @@
-FROM ubuntu:20.04
+FROM ubuntu:18.04
 # 维护者信息
 LABEL maintainer="Abulo Hoo"
 LABEL maintainer-email="abulo.hoo@gmail.com"
 
 
 
-
-ENV HIVE_VERSION 1.2.1
-ENV HADOOP_VERSION 2.7.0
-ENV HBASE_VERSION 1.1.2
-ENV SPARK_VERSION 2.3.1
-ENV KAFKA_VERSION 1.1.1
-ENV LIVY_VERSION 0.6.0
-ENV KYLIN_VERSION 3.1.1
-
-ENV JAVA_HOME /home/admin/jdk1.8.0_141
-ENV MVN_HOME /home/admin/apache-maven-3.6.1
-ENV HADOOP_HOME /home/admin/hadoop-$HADOOP_VERSION
-ENV HIVE_HOME /home/admin/apache-hive-$HIVE_VERSION-bin
-ENV HADOOP_CONF $HADOOP_HOME/etc/hadoop
-ENV HADOOP_CONF_DIR $HADOOP_HOME/etc/hadoop
-ENV HBASE_HOME /home/admin/hbase-$HBASE_VERSION
-ENV SPARK_HOME /home/admin/spark-$SPARK_VERSION-bin-hadoop2.6
-ENV SPARK_CONF_DIR /home/admin/spark-$SPARK_VERSION-bin-hadoop2.6/conf
-ENV KAFKA_HOME /home/admin/kafka_2.11-$KAFKA_VERSION
-ENV LIVY_HOME /home/admin/apache-livy-$LIVY_VERSION-incubating-bin
-ENV KYLIN_HOME /home/admin/apache-kylin-$KYLIN_VERSION-bin-hbase1x
-ENV PATH $PATH:$JAVA_HOME/bin:$HADOOP_HOME/bin:$HIVE_HOME/bin:$HBASE_HOME/bin:$MVN_HOME/bin:spark-$SPARK_VERSION-bin-hadoop2.6/bin:$KAFKA_HOME/bin:/usr/local/mysql/bin
-
-
 USER root
 
 WORKDIR /home/admin
 
+# 设置源
+RUN  sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/' /etc/apt/sources.list
 
-# install tools
-# RUN	sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/' /etc/apt/sources.list && \
-RUN apt-get -y update && \
-    apt-get install -y tzdata && \
-    rm /etc/localtime && \
-    ln -snf /usr/share/zoneinfo/UTC /etc/localtime && \
-    dpkg-reconfigure -f noninteractive tzdata && \
-    apt-get install --no-install-recommends -y -q  net-tools wget lsof tar git nodejs npm unzip ca-certificates vim libaio1 libncurses5 && \
-    cd /home/admin && \
-    git config --global http.sslVerify false && \
+#安装 mysql 
+RUN cd /home/admin && \
+    groupadd -r mysql && \
+    useradd -r -g mysql mysql && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends  curl net-tools  ca-certificates wget git mysql-server mysql-client && \
+	rm -rf /var/lib/apt/lists/* && \
+	rm -rf /var/lib/mysql && mkdir -p /var/lib/mysql /var/run/mysqld && \
+	chown -R mysql:mysql /var/lib/mysql /var/run/mysqld && \
+	chmod 1777 /var/run/mysqld /var/lib/mysql && \
+    mkdir /docker-entrypoint-initdb.d
+
+
+#数据分析模块环境变量
+ENV JAVA_HOME=/home/admin/jdk 
+ENV JAVA_BIN=/home/admin/jdk/bin
+ENV JAVA_LIB=/home/admin/jdk/lib
+ENV CLASSPATH=$CLASSPATH:/home/admin/jdk/lib/tools.jar:/home/admin/jdk/lib/dt.jar
+ENV HADOOP_HOME=/home/admin/hadoop
+ENV MAVEN_HOME=/home/admin/maven
+ENV HIVE_HOME=/home/admin/hive
+ENV ZK_HOME=/home/admin/zookeeper
+ENV HBASE_HOME=/home/admin/hbase
+ENV SCALA_HOME=/home/admin/scala
+ENV SPARK_HOME=/home/admin/spark
+ENV KAFKA_HOME=/home/admin/kafka
+ENV HADOOP_HDFS_HOME=/home/admin/hadoop
+ENV HADOOP_MAPRED_HOME=/home/admin/hadoop
+ENV HADOOP_COMMON_HOME=/home/admin/hadoop
+ENV HADOOP_COMMON_LIB_NATIVE_DIR=/home/admin/hadoop/lib/native
+ENV KYLIN_HOME=/home/admin/kylin
+ENV PATH=$PATH:/home/admin/jdk/bin:/home/admin/scala/bin:/home/admin/spark/bin:/home/admin/kafka/bin:/home/admin/spark/sbin:/home/admin/hadoop/bin:/home/admin/hadoop/sbin:/home/admin/maven/bin:/home/admin/hive/bin:/home/admin/zookeeper/bin:/home/admin/hbase/bin:/home/admin/scala/bin:/home/admin/spark/bin:/home/admin/kafka/bin:/home/admin/kylin/bin
+ENV # LC_ALL=en_us.UTF-8
+ENV LC_CTYPE=en_us
+ENV LANG=en_us.UTF-8
+#安装 
+RUN cd /home/admin && \
+	git config --global http.sslVerify false && \
     git clone https://github.com/abulo/docker-kylin.git && \
-    useradd -M -s /sbin/nologin mysql && \
-    mkdir -p /usr/local/mysql && \
-    mkdir -p /data/mysql && \
-    chown mysql.mysql -R /data/mysql && \
-    chown mysql.mysql -R /usr/local/mysql && \
-    wget -c -nv http://mirrors.tuna.tsinghua.edu.cn/mysql/downloads/MySQL-5.5/mysql-5.5.62-linux-glibc2.12-x86_64.tar.gz && \
-    tar xzf mysql-5.5.62-linux-glibc2.12-x86_64.tar.gz && \
-    mv mysql-5.5.62-linux-glibc2.12-x86_64/* /usr/local/mysql && \
-    sed -i "s@/usr/local/mysql@/usr/local/mysql@g" /usr/local/mysql/bin/mysqld_safe && \
-    cp /usr/local/mysql/support-files/mysql.server /etc/init.d/mysqld && \
-    sed -i "s@^basedir=.*@basedir=/usr/local/mysql@" /etc/init.d/mysqld && \
-    sed -i "s@^datadir=.*@datadir=/data/mysql@" /etc/init.d/mysqld && \
-    chmod +x /etc/init.d/mysqld && \
-    cd /home/admin && \    
-    /usr/local/mysql/scripts/mysql_install_db --user=mysql --basedir=/usr/local/mysql --datadir=/data/mysql && \
-    cp -rf /home/admin/docker-kylin/conf/mysql/my.cnf /etc/my.cnf && \
-    chmod 600 /etc/my.cnf && \
-    /etc/init.d/mysqld start && \
-    /usr/local/mysql/bin/mysql -e "grant all privileges on *.* to root@'127.0.0.1' identified by '123456' with grant option;" && \
-    /usr/local/mysql/bin/mysql -e "grant all privileges on *.* to root@'localhost' identified by '123456' with grant option;" && \
-    /usr/local/mysql/bin/mysql -uroot -p123456 -e "delete from mysql.user where Password='';" && \
-    /usr/local/mysql/bin/mysql -uroot -p123456 -e "delete from mysql.db where User='';" && \
-    /usr/local/mysql/bin/mysql -uroot -p123456 -e "delete from mysql.proxies_priv where Host!='localhost';" && \
-    /usr/local/mysql/bin/mysql -uroot -p123456 -e "drop database test;" && \
-    /usr/local/mysql/bin/mysql -uroot -p123456 -e "reset master;" && \
-    /etc/init.d/mysqld restart && \
-    cd /home/admin && \
-    # install mvn
-    wget -c -nv --no-check-certificate https://archive.apache.org/dist/maven/maven-3/3.6.1/binaries/apache-maven-3.6.1-bin.tar.gz && \
+	# 安装 jdk 
+	wget -c -nv --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u271-b09/61ae65e088624f5aaa0b1d2d801acb16/jdk-8u271-linux-x64.tar.gz" && \
+    tar -zxf jdk-8u141-linux-x64.tar.gz && \
+    rm -rf jdk-8u141-linux-x64.tar.gz && \
+	mv jdk1.8.0_271 jdk && \
+
+	#安装 hadoop
+	wget -c -nv --no-check-certificate https://archive.apache.org/dist/hadoop/core/hadoop-3.0.3/hadoop-3.0.3.tar.gz && \
+	tar zxf hadoop-3.0.3.tar.gz && \
+	rm -rf hadoop-3.0.3.tar.gz && \
+	mv hadoop-3.0.3 hadoop && \
+	#配置文件
+	cp -rf /home/admin/docker-kylin/conf/hadoop/hadoop/core-site.xml /home/admin/hadoop/etc/hadoop/core-site.xml && \
+    cp -rf /home/admin/docker-kylin/conf/hadoop/hadoop/hdfs-site.xml /home/admin/hadoop/etc/hadoop/hdfs-site.xml && \
+    cp -rf /home/admin/docker-kylin/conf/hadoop/yarn/mapred-site.xml /home/admin/hadoop/etc/hadoop/mapred-site.xml && \
+    cp -rf /home/admin/docker-kylin/conf/hadoop/yarn/yarn-site.xml /home/admin/hadoop/etc/hadoop/yarn-site.xml && \
+	# 安装 maven
+	wget -c -nv --no-check-certificate https://archive.apache.org/dist/maven/maven-3/3.6.1/binaries/apache-maven-3.6.1-bin.tar.gz && \
     tar -zxf apache-maven-3.6.1-bin.tar.gz && \
-    rm -f apache-maven-3.6.1-bin.tar.gz && \
-    cp -rf /home/admin/docker-kylin/conf/maven/settings.xml $MVN_HOME/conf/settings.xml && \
-    # setup jdk
-    wget -c -nv --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u141-b15/336fa29ff2bb4ef291e347e091f7f4a7/jdk-8u141-linux-x64.tar.gz" && \
-    tar -zxf /home/admin/jdk-8u141-linux-x64.tar.gz && \
-    rm -f /home/admin/jdk-8u141-linux-x64.tar.gz && \
-    # setup hadoop
-    wget -c -nv --no-check-certificate https://archive.apache.org/dist/hadoop/core/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz && \
-    tar -zxf /home/admin/hadoop-$HADOOP_VERSION.tar.gz && \
-    rm -f /home/admin/hadoop-$HADOOP_VERSION.tar.gz && \
-    mkdir -p /data/hadoop && \
-    cp -rf /home/admin/docker-kylin/conf/hadoop/* $HADOOP_CONF/ && \
-    # setup hbase
-    wget -c -nv --no-check-certificate https://archive.apache.org/dist/hbase/$HBASE_VERSION/hbase-$HBASE_VERSION-bin.tar.gz && \
-    tar -zxf /home/admin/hbase-$HBASE_VERSION-bin.tar.gz && \
-    rm -f /home/admin/hbase-$HBASE_VERSION-bin.tar.gz && \
-    mkdir -p /data/hbase && \
-    mkdir -p /data/zookeeper && \
-    cp -rf /home/admin/docker-kylin/conf/hbase/hbase-site.xml $HBASE_HOME/conf && \
-    # setup hive
-    wget -c -nv --no-check-certificate https://archive.apache.org/dist/hive/hive-$HIVE_VERSION/apache-hive-$HIVE_VERSION-bin.tar.gz && \
-    tar -zxf /home/admin/apache-hive-$HIVE_VERSION-bin.tar.gz && \
-    rm -f /home/admin/apache-hive-$HIVE_VERSION-bin.tar.gz && \
-    wget -c -nv --no-check-certificate -P $HIVE_HOME/lib https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.38/mysql-connector-java-5.1.38.jar && \
-    cp -rf /home/admin/docker-kylin/conf/hive/hive-site.xml $HIVE_HOME/conf && \
-    # setup spark
-    wget -c -nv --no-check-certificate https://archive.apache.org/dist/spark/spark-$SPARK_VERSION/spark-$SPARK_VERSION-bin-hadoop2.6.tgz && \
-    tar -zxf /home/admin/spark-$SPARK_VERSION-bin-hadoop2.6.tgz && \
-    rm -f /home/admin/spark-$SPARK_VERSION-bin-hadoop2.6.tgz && \
-    cp -rf $HIVE_HOME/conf/hive-site.xml $SPARK_HOME/conf && \
-    cp -rf $SPARK_HOME/yarn/*.jar $HADOOP_HOME/share/hadoop/yarn/lib && \
-    cp -rf $HIVE_HOME/lib/mysql-connector-java-5.1.38.jar $SPARK_HOME/jars && \
-    cp -rf $HBASE_HOME/lib/hbase-protocol-1.1.2.jar $SPARK_HOME/jars && \
-    echo spark.sql.catalogImplementation=hive > $SPARK_HOME/conf/spark-defaults.conf && \
-    # setup kafka
-    wget -c -nv  --no-check-certificate https://archive.apache.org/dist/kafka/$KAFKA_VERSION/kafka_2.11-$KAFKA_VERSION.tgz && \
-    tar -zxf /home/admin/kafka_2.11-$KAFKA_VERSION.tgz && \
-    rm -f /home/admin/kafka_2.11-$KAFKA_VERSION.tgz   && \
-    # setup livy
-    wget -c -nv  --no-check-certificate https://www.apache.org/dist/incubator/livy/$LIVY_VERSION-incubating/apache-livy-$LIVY_VERSION-incubating-bin.zip && \
-    unzip /home/admin/apache-livy-$LIVY_VERSION-incubating-bin.zip && \
-    rm -f /home/admin/apache-livy-$LIVY_VERSION-incubating-bin.zip && \
-    # Download released Kylin
-    wget -c -nv --no-check-certificate https://archive.apache.org/dist/kylin/apache-kylin-$KYLIN_VERSION/apache-kylin-$KYLIN_VERSION-bin-hbase1x.tar.gz && \
-    tar -zxf /home/admin/apache-kylin-$KYLIN_VERSION-bin-hbase1x.tar.gz && \
-    rm -f /home/admin/apache-kylin-$KYLIN_VERSION-bin-hbase1x.tar.gz && \
-    cp -rf $HIVE_HOME/hcatalog/share/hcatalog/hive-hcatalog-core-1.2.1.jar $SPARK_HOME/jars/ && \
-    #seting
-    echo "kylin.engine.livy-conf.livy-enabled=true" >>  $KYLIN_HOME/conf/kylin.properties && \
-    echo "kylin.engine.livy-conf.livy-url=http://127.0.0.1:8998" >>  $KYLIN_HOME/conf/kylin.properties && \
-    echo kylin.engine.livy-conf.livy-key.file=hdfs://localhost:9000/kylin/livy/kylin-job-$KYLIN_VERSION.jar >> $KYLIN_HOME/conf/kylin.properties && \
-    echo kylin.engine.livy-conf.livy-arr.jars=hdfs://localhost:9000/kylin/livy/hbase-client-$HBASE_VERSION.jar,hdfs://localhost:9000/kylin/livy/hbase-common-$HBASE_VERSION.jar,hdfs://localhost:9000/kylin/livy/hbase-hadoop-compat-$HBASE_VERSION.jar,hdfs://localhost:9000/kylin/livy/hbase-hadoop2-compat-$HBASE_VERSION.jar,hdfs://localhost:9000/kylin/livy/hbase-server-$HBASE_VERSION.jar,hdfs://localhost:9000/kylin/livy/htrace-core-*-incubating.jar,hdfs://localhost:9000/kylin/livy/metrics-core-*.jar >> $KYLIN_HOME/conf/kylin.properties && \
-    echo kylin.source.hive.quote-enabled=false >> $KYLIN_HOME/conf/kylin.properties && \
-    echo kylin.engine.spark-conf.spark.eventLog.dir=hdfs://localhost:9000/kylin/spark-history >> $KYLIN_HOME/conf/kylin.properties && \
-    echo kylin.engine.spark-conf.spark.history.fs.logDirectory=hdfs://localhost:9000/kylin/spark-history >> $KYLIN_HOME/conf/kylin.properties && \
-    echo kylin.engine.spark-conf-mergedict.spark.executor.memory=1G >> $KYLIN_HOME/conf/kylin.properties && \
-    echo kylin.engine.spark-conf.spark.driver.memory=512M >> $KYLIN_HOME/conf/kylin.properties && \
-    echo kylin.engine.spark-conf.spark.executor.memory=1G >> $KYLIN_HOME/conf/kylin.properties && \
-    echo kylin.engine.spark-conf.spark.executor.instances=1 >> $KYLIN_HOME/conf/kylin.properties && \
-    echo kylin.engine.spark-conf.spark.executor.memoryOverhead=512M >> $KYLIN_HOME/conf/kylin.properties && \
-    echo kylin.source.hive.redistribute-flat-table=false >> $KYLIN_HOME/conf/kylin.properties && \
-    echo kylin.engine.spark-fact-distinct=true >> $KYLIN_HOME/conf/kylin.properties && \
-    echo kylin.engine.spark-udc-dictionary=true >> $KYLIN_HOME/conf/kylin.properties && \
-    cp /home/admin/docker-kylin/entrypoint.sh /home/admin/entrypoint.sh && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* && \
-    rm -rf /home/admin/docker-kylin && \
-    chmod u+x /home/admin/entrypoint.sh
-ENTRYPOINT ["/home/admin/entrypoint.sh"]
+    rm -rf apache-maven-3.6.1-bin.tar.gz && \
+	mv apache-maven-3.6.1-bin maven && \
+	# 安装 hbase 
+	wget -c -nv --no-check-certificate  https://archive.apache.org/dist/hbase/2.2.4/hbase-2.2.4-bin.tar.gz && \
+	tar -zxf hbase-2.2.4-bin.tar.gz && \
+    rm -rf hbase-2.2.4-bin.tar.gz && \
+	mv hbase-2.2.4-bin hbase && \
+	# 配置文件
+	cp -rf /home/admin/docker-kylin/conf/hbase/hbase-site.xml /home/admin/hbase/conf/hbase-site.xml && \
+    cp -rf /home/admin/docker-kylin/conf/hbase/hbase /home/admin/hbase/bin/hbase && \
+	#安装 hive 
+	wget -c -nv --no-check-certificate  https://archive.apache.org/dist/hive/hive-3.1.2/apache-hive-3.1.2-bin.tar.gz && \
+	tar -zxf apache-hive-3.1.2-bin.tar.gz && \
+    rm -rf apache-hive-3.1.2-bin.tar.gz && \
+	mv apache-hive-3.1.2-bin hive && \
+	#配置
+	cp -rf /home/admin/docker-kylin/conf/hive/hive-site.xml /home/admin/hive/conf/hive-site.xml && \
+	cp -rf /home/admin/docker-kylin/conf/hive/hive-env.sh  /home/admin/hive/conf/hive-env.sh && \
+	cp -rf /home/admin/docker-kylin/conf/mysql/mysql-connector-java-5.1.45-bin.jar /home/admin/hive/lib/mysql-connector-java-5.1.45-bin.jar && \
+	# 安装 spark
+	wget -c -nv --no-check-certificate   https://archive.apache.org/dist/spark/spark-2.4.5/spark-2.4.5-bin-without-hadoop.tgz && \
+	tar -zxf spark-2.4.5-bin-without-hadoop.tgz && \
+    rm -rf spark-2.4.5-bin-without-hadoop.tgz && \
+	mv spark-2.4.5-bin-without-hadoop spark && \
+	# 配置
+	cp -rf /home/admin/docker-kylin/conf/spark/spark-env.sh /home/admin/spark/conf/spark-env.sh && \
+	cp -rf /home/admin/docker-kylin/conf/spark/spark-default.conf /home/admin/spark/conf/spark-default.conf && \
+	cp -rf /home/admin/docker-kylin/conf/spark/slaves /home/admin/spark/conf/slaves && \
+	#安装 scala
+	wget -c -nv --no-check-certificate https://downloads.lightbend.com/scala/2.11.12/scala-2.11.12.tgz && \
+	tar -zxf scala-2.11.12.tgz && \
+    rm -rf scala-2.11.12.tgz && \
+	mv scala-2.11.12 scala && \
+	#安装 Zookeeper
+	wget -c -nv --no-check-certificate https://archive.apache.org/dist/zookeeper/zookeeper-3.4.5/zookeeper-3.4.5.tar.gz && \
+	tar -zxf zookeeper-3.4.5.tar.gz && \
+    rm -rf zookeeper-3.4.5.tar.gz && \
+	mv zookeeper-3.4.5 zookeeper && \
+	cp -rf /home/admin/docker-kylin/conf/zk/zoo.cfg /home/admin/zookeeper/conf/zoo.cfg && \
+	# 安装 kafka
+	wget -c -nv --no-check-certificate  https://archive.apache.org/dist/kafka/2.4.1/kafka_2.11-2.4.1.tgz && \
+	tar -zxf kafka_2.11-2.4.1.tgz && \
+    rm -rf kafka_2.11-2.4.1.tgz && \
+	mv kafka_2.11-2.4.1 kafka && \
+	#安装 kylin 
+	wget -c -nv --no-check-certificate https://archive.apache.org/dist/kylin/apache-kylin-3.0.1/apache-kylin-3.0.1-bin-hadoop3.tar.gz && \
+	tar -zxf apache-kylin-3.0.1-bin-hadoop3.tar.gz && \
+    rm -rf apache-kylin-3.0.1-bin-hadoop3.tar.gz && \
+	mv apache-kylin-3.0.1-bin-hadoop3 kylin && \
+	cp -rf /home/admin/docker-kylin/conf/kylin/kylin.properties /home/admin/kylin/conf/kylin.properties && \
+	cp -rf /home/admin/docker-kylin/conf/mysql/mysql-connector-java-5.1.45-bin.jar /home/admin/kylin/ext/mysql-connector-java-5.1.45-bin.jar && \
+	cp /home/admin/docker-kylin/conf/mysql/docker-entrypoint.sh  /home/admin/mysql.sh && \
+	chmod u+x /home/admin/mysql.sh && \
+	cp /home/admin/docker-kylin/conf/start.sh  /home/admin/start.sh && \
+	chmod u+x /home/admin/start.sh && \
+	rm -rf /home/admin/docker-kylin 
+
+VOLUME /var/lib/mysql
+ENTRYPOINT ["/home/admin/start.sh"]
