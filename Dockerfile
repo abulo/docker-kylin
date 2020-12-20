@@ -124,7 +124,7 @@ RUN cd /home/admin && \
 	# cp -rf /home/admin/docker-kylin/conf/mysql/mysql-connector-java-5.1.45-bin.jar /home/admin/kylin/ext/mysql-connector-java-5.1.45-bin.jar && \
 	cp /home/admin/docker-kylin/conf/mysql/docker-entrypoint.sh  /home/admin/mysql.sh && \
 	chmod u+x /home/admin/mysql.sh && \
-	cp /home/admin/docker-kylin/conf/start.sh  /home/admin/start.sh && \
+	cp /home/admin/docker-kylin/start.sh  /home/admin/start.sh && \
 	chmod u+x /home/admin/start.sh && \
 	rm -rf  docker-kylin && \
 	apt-get clean 
