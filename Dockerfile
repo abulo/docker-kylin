@@ -105,7 +105,13 @@ RUN cd /home/admin && \
     echo kylin.engine.spark-udc-dictionary=true >> $KYLIN_HOME/conf/kylin.properties && \
     echo kylin.web.dashboard-enabled=true >> $KYLIN_HOME/conf/kylin.properties && \
     cp -rf /home/admin/docker-kylin/conf/entrypoint.sh /home/admin/entrypoint.sh && \
-    chmod u+x /home/admin/entrypoint.sh
+    chmod u+x /home/admin/entrypoint.sh && \
+    rm -rf /home/admin/docker-kylin && \
+    rm -rf /tmp/* && \
+    rm -rf /var/log/* && \
+    rm -rf /var/cache/* && \
+    rm -rf /var/lib/*
+
     
 
 ENTRYPOINT ["/home/admin/entrypoint.sh"]
