@@ -98,7 +98,7 @@ COPY conf/hadoop/* $HADOOP_CONF/
 COPY conf/hbase/hbase-site.xml $HBASE_HOME/conf
 COPY conf/hive/hive-site.xml $HIVE_HOME/conf
 COPY conf/hive/mysql-connector-java-8.0.22.jar $HIVE_HOME/lib/mysql-connector-java-8.0.22.jar
-COPY confentrypoint.sh /home/admin/entrypoint.sh
+COPY conf/entrypoint.sh /home/admin/entrypoint.sh
 
 
 RUN chmod u+x /home/admin/entrypoint.sh && \
