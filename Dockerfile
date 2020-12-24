@@ -26,6 +26,8 @@ RUN cd /home/admin && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get autoremove -y && \
     apt-get clean all && \
+    git config --global http.sslVerify false && \
+    git clone https://github.com/abulo/docker-kylin.git && \
     #安装 jdk 
     cd /home/admin && \
     wget -c -nv  --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u271-b09/61ae65e088624f5aaa0b1d2d801acb16/jdk-8u271-linux-x64.tar.gz" && \
@@ -38,6 +40,7 @@ RUN cd /home/admin && \
     tar -zxf apache-maven-3.6.1-bin.tar.gz && \
     rm -rf  apache-maven-3.6.1-bin.tar.gz && \
 	mv apache-maven-3.6.1 maven   && \
+    cp -rf /home/admin/docker-kylin/conf/maven/settings.xml $MVN_HOME/conf/settings.xml && \
     #安装 hadoop
     cd /home/admin && \
 	wget -c -nv --no-check-certificate https://archive.apache.org/dist/hadoop/core/hadoop-3.0.3/hadoop-3.0.3.tar.gz && \
@@ -45,6 +48,7 @@ RUN cd /home/admin && \
 	rm -rf hadoop-3.0.3.tar.gz && \
 	mv hadoop-3.0.3 hadoop && \
     mkdir -p /data/hadoop && \
+    cp -rf /home/admin/docker-kylin/conf/hadoop/* $HADOOP_CONF/ && \
     # 安装 hbase 
     cd /home/admin && \
 	wget -c -nv --no-check-certificate  https://archive.apache.org/dist/hbase/2.2.4/hbase-2.2.4-bin.tar.gz && \
@@ -53,25 +57,34 @@ RUN cd /home/admin && \
 	mv hbase-2.2.4 hbase && \
     mkdir -p /data/hbase && \
     mkdir -p /data/zookeeper && \
+    cp -rf /home/admin/docker-kylin/conf/hbase/hbase-site.xml $HBASE_HOME/conf && \
     #安装 hive 
     cd /home/admin && \
 	wget -c -nv --no-check-certificate  https://archive.apache.org/dist/hive/hive-3.1.2/apache-hive-3.1.2-bin.tar.gz && \
 	tar -zxf apache-hive-3.1.2-bin.tar.gz && \
     rm -rf  apache-hive-3.1.2-bin.tar.gz && \
 	mv apache-hive-3.1.2-bin hive && \
+    cp -rf /home/admin/docker-kylin/conf/hive/hive-site.xml $HIVE_HOME/conf && \
+    cp -rf /home/admin/docker-kylin/conf/hive/mysql-connector-java-8.0.22.jar $HIVE_HOME/lib/mysql-connector-java-8.0.22.jar && \
     #安装 spark 
     cd /home/admin && \
     wget -c -nv --no-check-certificate   https://archive.apache.org/dist/spark/spark-2.4.5/spark-2.4.5-bin-without-hadoop.tgz && \
 	tar -zxf spark-2.4.5-bin-without-hadoop.tgz && \
     rm -rf  spark-2.4.5-bin-without-hadoop.tgz && \
 	mv spark-2.4.5-bin-without-hadoop spark && \
+    cp $HIVE_HOME/conf/hive-site.xml $SPARK_HOME/conf && \
+    cp $SPARK_HOME/yarn/*.jar $HADOOP_HOME/share/hadoop/yarn/lib && \
+    cp $HIVE_HOME/lib/mysql-connector-java-8.0.22.jar $SPARK_HOME/jars && \
+    cp $HBASE_HOME/lib/hbase-protocol-2.2.4.jar $SPARK_HOME/jars && \
+    cp $HIVE_HOME/hcatalog/share/hcatalog/hive-hcatalog-core-3.1.2.jar $SPARK_HOME/jars/ && \
+    echo spark.sql.catalogImplementation=hive > $SPARK_HOME/conf/spark-defaults.conf && \
     # 安装 kafka
     cd /home/admin && \
 	wget -c -nv --no-check-certificate  https://archive.apache.org/dist/kafka/2.4.1/kafka_2.11-2.4.1.tgz && \
 	tar -zxf kafka_2.11-2.4.1.tgz && \
     rm -rf  kafka_2.11-2.4.1.tgz && \
 	mv kafka_2.11-2.4.1 kafka && \
-    mkdir -pv /data/kafka && \
+    mkdir -p /data/kafka && \
     sed -i -e 's/log.dirs=.*/log.dirs=\/data\/kafka/' $KAFKA_HOME/config/server.properties && \
     #安装 kylin 
     cd /home/admin && \
@@ -90,23 +103,9 @@ RUN cd /home/admin && \
     echo kylin.source.hive.redistribute-flat-table=false >> $KYLIN_HOME/conf/kylin.properties  &&  \
     echo kylin.engine.spark-fact-distinct=true >> $KYLIN_HOME/conf/kylin.properties  &&  \
     echo kylin.engine.spark-udc-dictionary=true >> $KYLIN_HOME/conf/kylin.properties && \
-    echo kylin.web.dashboard-enabled=true >> $KYLIN_HOME/conf/kylin.properties 
-
-
-COPY conf/maven/settings.xml $MVN_HOME/conf/settings.xml
-COPY conf/hadoop/* $HADOOP_CONF/
-COPY conf/hbase/hbase-site.xml $HBASE_HOME/conf
-COPY conf/hive/hive-site.xml $HIVE_HOME/conf
-COPY conf/hive/mysql-connector-java-8.0.22.jar $HIVE_HOME/lib/mysql-connector-java-8.0.22.jar
-COPY conf/entrypoint.sh /home/admin/entrypoint.sh
-
-
-RUN chmod u+x /home/admin/entrypoint.sh && \
-    cp $HIVE_HOME/conf/hive-site.xml $SPARK_HOME/conf && \
-    cp $SPARK_HOME/yarn/*.jar $HADOOP_HOME/share/hadoop/yarn/lib && \
-    cp $HIVE_HOME/lib/mysql-connector-java-8.0.22.jar $SPARK_HOME/jars && \
-    cp $HBASE_HOME/lib/hbase-protocol-2.2.4.jar $SPARK_HOME/jars && \
-    cp $HIVE_HOME/hcatalog/share/hcatalog/hive-hcatalog-core-3.1.2.jar $SPARK_HOME/jars/ && \
-    echo spark.sql.catalogImplementation=hive > $SPARK_HOME/conf/spark-defaults.conf
+    echo kylin.web.dashboard-enabled=true >> $KYLIN_HOME/conf/kylin.properties && \
+    cp -rf /home/admin/docker-kylin/conf/entrypoint.sh /home/admin/entrypoint.sh && \
+    chmod u+x /home/admin/entrypoint.sh
+    
 
 ENTRYPOINT ["/home/admin/entrypoint.sh"]
