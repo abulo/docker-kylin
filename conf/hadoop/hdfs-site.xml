@@ -6,7 +6,11 @@
         <value>1</value>
     </property>
     <property>
-        <name>dfs.namenode.http-address</name>
-        <value>localhost:50070</value>
+        <name>dfs.namenode.name.dir</name>
+        <value>/data/hadoop/dfs/name</value>
+    </property>
+    <property>
+        <name>dfs.datanode.data.dir</name>
+        <value>/data/hadoop/dfs/data</value>
     </property>
 </configuration>
