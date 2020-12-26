@@ -19,7 +19,8 @@ ENV PATH $PATH:$JAVA_HOME/bin:$HADOOP_HOME/bin:$HIVE_HOME/bin:$HBASE_HOME/bin:$M
 USER root
 WORKDIR /home/admin
 
-RUN apt-get install -y --no-install-recommends tzdata && \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends tzdata && \
     rm /etc/localtime && \
     ln -snf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     dpkg-reconfigure -f noninteractive tzdata && \
