@@ -19,7 +19,11 @@ ENV PATH $PATH:$JAVA_HOME/bin:$HADOOP_HOME/bin:$HIVE_HOME/bin:$HBASE_HOME/bin:$M
 USER root
 WORKDIR /home/admin
 
-RUN cd /home/admin && \
+RUN apt-get install -y --no-install-recommends tzdata && \
+    rm /etc/localtime && \
+    ln -snf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+    dpkg-reconfigure -f noninteractive tzdata && \
+    cd /home/admin && \
     apt-get update && \
     apt-get install -y --no-install-recommends  curl net-tools  vim wget ca-certificates tar  git && \
     apt-get remove -f && \

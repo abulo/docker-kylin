@@ -14,7 +14,6 @@
    *  [kylin](https://mirrors.tuna.tsinghua.edu.cn/apache/kylin/apache-kylin-3.0.1/apache-kylin-3.0.1-bin-hadoop3.tar.gz): 3.0.1
 
 *  start: `docker-compose up -d`
-![输入图片说明](https://images.gitee.com/uploads/images/2020/0512/125759_c2f403ef_379161.png "start_success.png")
 *  check after start
    *  HDFS NameNode: http://ip:50070
    *  YARN ResourceManager: http://ip:8088
